@@ -24,7 +24,7 @@
  * IN THE SOFTWARE.
  */
 
-use GreyhoundRpcp\Core\GhRpcStruct;
+namespace GreyhoundRpcp\Core;
 
 /**
  * Klasse für RPC-Fault Ergebnisse.
