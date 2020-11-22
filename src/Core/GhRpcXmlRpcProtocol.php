@@ -26,7 +26,6 @@
 
 namespace GreyhoundRpcp\Core;
 
-use GhRpcFault;
 use GreyhoundRpcp\Exception\GhRpcAuthenticationException;
 use GreyhoundRpcp\Exception\GhRpcConnectionException;
 use GreyhoundRpcp\Exception\GhRpcException;
@@ -505,9 +504,15 @@ class GhRpcXmlRpcProtocol extends GhRpcProtocol
                         $resultStack[] = $newResult;
                         break;
                     case 'struct':
-                        $expectedType = 'GreyhoundRpcp\Rpc\\' . $expectedType;
-                        if (!is_subclass_of($expectedType, GhRpcStruct::class))
-                            throw new GhRpcException('Unexpected struct in rpc xml response, expected "' . $expectedType . '"');
+                        if (!is_subclass_of($expectedType, GhRpcStruct::class)) {
+                            if (is_subclass_of('GreyhoundRpcp\Rpc\\' . $expectedType, GhRpcStruct::class)) {
+                                $expectedType = 'GreyhoundRpcp\Rpc\\' . $expectedType;
+                            } else if (is_subclass_of('GreyhoundRpcp\Core\\' . $expectedType, GhRpcStruct::class)) {
+                                $expectedType = 'GreyhoundRpcp\Core\\' . $expectedType;
+                            } else {
+                                throw new GhRpcException('Unexpected struct in rpc xml response, expected "' . $expectedType . '"');
+                            }
+                        }
 
                         $newResult = ['value' => new $expectedType(), 'type' => 'struct', 'expect' => null];
                         $resultStack[] = $newResult;
